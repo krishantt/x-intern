@@ -1,24 +1,20 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react"
+import { Button } from "@/components/ui/button";
+import { FaGoogle } from "react-icons/fa";
+import MainLayout from "@/components/mainLayout";
+
 export default function LoginButton() {
     const { data: session } = useSession()
     if (session) {
-        return (
-            <>
-                Signed in as {session.user?.email as string}
-                <br />
-                <button onClick={() => signOut()}>
-                    Sign out
-                </button>
-            </>);
+        return <MainLayout/>;
     }
     return (
         <>
-            Not signed in
-            <br />
-            <button onClick={() => signIn('google')}>
-                Sign in
-            </button>
+            <Button onClick={() => signIn('google')}>
+                <FaGoogle className="mr-2" />
+                Sign in with Google
+            </Button>
         </>);
 }
