@@ -5,8 +5,42 @@ import { Input } from "@/components/ui/input";
 import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import EmailList from "./emailList";
+import { IEmail } from "gmail-api-parse-message-ts";
+import { useEffect, useState } from 'react';
+
+
+
 
 export default function MainLayout() {
+    const [emails, setEmails] = useState<IEmail[]>([]);
+    const [response, setResponse] = useState<string>("");
+
+    const classify = async () => {
+        const response = await fetch('/api/ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ apiKey: localStorage.getItem("apiKey"), emails: emails }),
+        }
+        );
+        setResponse(await response.text());
+    }
+
+
+    useEffect(() => {
+        const fetchEmails = async () => {
+            try {
+                const response = await fetch('/api/gmail');
+                const data = await response.json();
+                setEmails(data.emailList);
+            } catch (error) {
+                console.error('Error fetching emails:', error);
+            }
+        };
+
+        fetchEmails();
+    }, []);
     let value
     value = localStorage.getItem("apiKey") || ""
     const { data: session } = useSession()
@@ -27,9 +61,10 @@ export default function MainLayout() {
             </div>
             <div className="flex flex-row justify-between w-full">
                 <Input type="number" className="w-1/12" defaultValue={3} />
-                <Button onClick={() => { }} variant="secondary">Classify</Button>
+                <Button onClick={() => { classify()}} variant="secondary">Classify</Button>
             </div>
-            <EmailList />
+
+            <EmailList emails={emails} />
         </>
 
     );

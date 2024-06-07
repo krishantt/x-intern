@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -66,33 +65,16 @@ const EmailDrawer = ({ ...props }) => {
 }
 
 
-const EmailList = () => {
-  const [emails, setEmails] = useState<IEmail[]>([]);
-
-  useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        const response = await fetch('/api/gmail');
-        const data = await response.json();
-        setEmails(data.emailList);
-      } catch (error) {
-        console.error('Error fetching emails:', error);
-      }
-    };
-
-    fetchEmails();
-  }, []);
-
+const EmailList = ({ emails }: { emails: IEmail[] }) => {
   return (
     <div className='space-y-10'>
       {emails.length === 0 && <p>No emails found.</p>}
-
       {emails.map((email) => (
         <EmailDrawer email={email} key={email.id} />
       ))}
-
     </div>
   );
 };
 
 export default EmailList;
+
