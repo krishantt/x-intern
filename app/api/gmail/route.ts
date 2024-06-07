@@ -15,15 +15,12 @@ const getEmails = async (
 
   // Collect all promises
   const emailPromises = messages.map(async (m) => {
-  
     const emailResponse = await gmail.users.messages.get({
       userId: "me",
       id: m.id as string,
     });
-    console.log(emailResponse.data);
     const parse = new ParseGmailApi();
     const email: IEmail = parse.parseMessage(emailResponse.data);
-    // console.log(email);
 
     emailList.push(email);
   });

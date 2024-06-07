@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signIn} from "next-auth/react"
+import { useSession, signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaGoogle } from "react-icons/fa";
@@ -29,30 +29,30 @@ export function AlertDemo() {
 
 
 export default function LoginButton() {
-    const { data: session } = useSession()
-    let value
-    value = localStorage.getItem("apiKey") || ""
-    const [apikey, setApiKey] = useState(value)
-    const [invalidKey, setInvalidKey] = useState(false)
+  const { data: session } = useSession()
+  let value
+  value = localStorage.getItem("apiKey") || ""
+  const [apikey, setApiKey] = useState(value)
+  const [invalidKey, setInvalidKey] = useState(false)
 
-    const handleClick = () => {
-        if (apikey === "") {
-            setInvalidKey(true)
-            return
-        }
-        localStorage.setItem("apiKey", apikey)
-        signIn("google")
+  const handleClick = () => {
+    if (apikey === "") {
+      setInvalidKey(true)
+      return
     }
-    if (session) {
-        return <MainLayout/>;
-    }
-    return (
-        <>
-            {invalidKey && <AlertDemo/>}
-            <Input type="text" placeholder="Enter your OpenAI key..." onChange={e=> setApiKey(e.target.value)}/>
-            <Button onClick={handleClick}>
-                <FaGoogle className="mr-2" />
-                Sign in with Google
-            </Button>
-        </>);
+    localStorage.setItem("apiKey", apikey)
+    signIn("google")
+  }
+  if (session) {
+    return <MainLayout />;
+  }
+  return (
+    <>
+      {invalidKey && <AlertDemo />}
+      <Input type="text" placeholder="Enter your OpenAI key..." onChange={e => setApiKey(e.target.value)} />
+      <Button onClick={handleClick}>
+        <FaGoogle className="mr-2" />
+        Sign in with Google
+      </Button>
+    </>);
 }

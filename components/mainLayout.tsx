@@ -20,16 +20,16 @@ export default function MainLayout() {
                     </Avatar>
                     <div className="flex flex-col items-start justify-start">
                         <h1 className="text-xl font-bold">{session?.user.name}</h1>
-                        <p className="text-sm">{session?.user.email }</p>
+                        <p className="text-sm">{session?.user.email}</p>
                     </div>
                 </div>
                 <Button onClick={() => signOut()}>Sign out</Button>
             </div>
             <div className="flex flex-row justify-between w-full">
-                <Input type="number" className="w-1/12"/>
-                <Button onClick={() => {}} variant="secondary">Classify</Button>
+                <Input type="number" className="w-1/12" defaultValue={3} />
+                <Button onClick={() => { }} variant="secondary">Classify</Button>
             </div>
-            <EmailList/>
+            <EmailList />
         </>
 
     );
