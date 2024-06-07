@@ -7,30 +7,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { IEmail } from 'gmail-api-parse-message-ts';
 
-type Email = {
-  id: string;
-  from: string;
-  subject: string;
-  snippet: string;
-};
 
-const EmailCard  = (email : Email, key:string) => {
+const EmailCard  = ({...props}) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{email.subject}</CardTitle>
-        <CardDescription>{email.from}</CardDescription>
+        <CardTitle>{props.email.subject}</CardTitle>
+        <CardDescription>
+          <div className='flex flex-row justify-between'>
+              <div>{props.email.from.name} | {props.email.from.email}</div>
+              <div>{new Date(props.email.sentDate).toDateString()}</div>
+          </div>
+          </CardDescription>
       </CardHeader>
-      <CardContent>{email.snippet}</CardContent>
-      <CardFooter>{email.id}</CardFooter>
+      <CardContent>{props.email.snippet}</CardContent>
+      <CardFooter>{props.email.id}</CardFooter>
     </Card>
   );
 }
 
 
 const EmailList = () => {
-  const [emails, setEmails] = useState<Email[]>([]);
+  const [emails, setEmails] = useState<IEmail[]>([]);
 
   useEffect(() => {
     const fetchEmails = async () => {
@@ -47,13 +47,13 @@ const EmailList = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Your Emails</h1>
-      <ul>
+    <div className='space-y-10'>
+        {emails.length === 0 && <p>No emails found.</p>} 
+    
         {emails.map((email) => (
           <EmailCard email={email} key={email.id}/>
         ))}
-      </ul>
+      
     </div>
   );
 };

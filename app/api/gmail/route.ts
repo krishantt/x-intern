@@ -3,54 +3,36 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
-import base64 from 'base-64';
-import { JSDOM } from 'jsdom';
+import base64 from "base-64";
+import { JSDOM } from "jsdom";
+import { IEmail, ParseGmailApi } from "gmail-api-parse-message-ts";
 
-const getEmails = async (messages: gmail_v1.Schema$Message[], gmail: gmail_v1.Gmail) => {
-    const emailList: Array<{ subject: string, sender: string, body: string, snippet: string }> = [];
+const getEmails = async (
+  messages: gmail_v1.Schema$Message[],
+  gmail: gmail_v1.Gmail
+) => {
+  const emailList: IEmail[] = [];
+
+  // Collect all promises
+  const emailPromises = messages.map(async (m) => {
   
-    // Collect all promises
-    const emailPromises = messages.map(async (m) => {
-      const email = await gmail.users.messages.get({ userId: "me", id: m.id as string });
-    //   console.log(email.data);
-  
-      try {
-        const payload = email.data.payload;
-        const headers = payload?.headers;
-        const snippet = email.data.snippet as string
-        
-        let subject = '';
-        let sender = '';
-  
-        for (const header of headers!) {
-          if (header.name === 'Subject') {
-            subject = header.value as string;
-          } else if (header.name === 'From') {
-            sender = header.value as string;
-          }
-        }
-  
-        const parts = payload?.parts?.[0];
-        const data = parts?.body?.data;
-  
-        if (data) {
-          const decodedData = base64.decode(data.replace(/-/g, '+').replace(/_/g, '/'));
-          const dom = new JSDOM(decodedData);
-          const body = dom.window.document.body.textContent || '';
-  
-          emailList.push({ subject, sender, body, snippet });
-        }
-      } catch (error) {
-        console.error('Error processing email:', error);
-      }
+    const emailResponse = await gmail.users.messages.get({
+      userId: "me",
+      id: m.id as string,
     });
-  
-    // Wait for all promises to resolve
-    await Promise.all(emailPromises);
-  
-    return emailList;
-  }
-  
+    console.log(emailResponse.data);
+    const parse = new ParseGmailApi();
+    const email: IEmail = parse.parseMessage(emailResponse.data);
+    // console.log(email);
+
+    emailList.push(email);
+  });
+
+  // Wait for all promises to resolve
+  await Promise.all(emailPromises);
+
+  return emailList;
+};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getServerSession(authOptions);
