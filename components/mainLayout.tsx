@@ -7,14 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import EmailList from "./emailList";
 import { IEmail } from "gmail-api-parse-message-ts";
 import { useEffect, useState } from 'react';
-import { JetBrains_Mono } from "next/font/google";
 
+import { useRouter } from "next/navigation";
 
 
 
 export default function MainLayout() {
     const [emails, setEmails] = useState<IEmail[]>([]);
-    const [response, setResponse] = useState<string>("");
+    const [emailLabels, setEmailLabels] = useState<string>("{}");
+    const router = useRouter();
 
     const classify = async () => {
         const res = await fetch('/api/ai', {
@@ -26,8 +27,9 @@ export default function MainLayout() {
         }
         );
         const json = await res.json();
-        setResponse(json);
-        await localStorage.setItem("classify", JSON.stringify(json));
+        setEmailLabels(JSON.stringify(json));
+        window.localStorage.setItem("classify", JSON.stringify(json));
+        window.location.reload();
     }
 
 
@@ -41,13 +43,12 @@ export default function MainLayout() {
                 console.error('Error fetching emails:', error);
             }
         };
-
         fetchEmails();
     }, []);
     let value
-    value = localStorage.getItem("apiKey") || ""
+    value = window.localStorage.getItem("apiKey") || ""
     let value2
-    value2 = localStorage.getItem("classify") || ""
+    value2 = window.localStorage.getItem("classify") || ""
     const { data: session } = useSession()
     return (
         <>

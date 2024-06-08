@@ -31,7 +31,7 @@ export function AlertDemo() {
 export default function LoginButton() {
   const { data: session } = useSession()
   let value
-  value = localStorage.getItem("apiKey") || ""
+  value = window.localStorage.getItem("apiKey") || ""
   const [apikey, setApiKey] = useState(value)
   const [invalidKey, setInvalidKey] = useState(false)
 
@@ -40,7 +40,7 @@ export default function LoginButton() {
       setInvalidKey(true)
       return
     }
-    localStorage.setItem("apiKey", apikey)
+    window.localStorage.setItem("apiKey", apikey)
     signIn("google")
   }
   if (session) {

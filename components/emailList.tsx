@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -8,73 +9,78 @@ import {
 } from "@/components/ui/card";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-
+} from "@/components/ui/drawer";
 import { IEmail } from 'gmail-api-parse-message-ts';
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+
+interface EmailCardProps {
+  email: IEmail;
+}
+
+const EmailCard: React.FC<EmailCardProps> = ({ email }) => {
+  const [emailLabel, setEmailLabel] = useState<string>("");
+
+  useEffect(() => {
+    const labels = window.localStorage.getItem("classify") || "{}";
+    const classify = JSON.parse(labels);
+    const email_ = classify?.object?.result.find((e: { id: string }) => e.id === email.id);
+    const label = email_ ? email_.label : "";
+    setEmailLabel(label);
+  }, []);
 
 
-const EmailCard = ({ ...props }) => {
-  const getLabel = (id: string) => {
-    const classify = JSON.parse(localStorage.getItem("classify") || "")
-    const email = classify.object.result.find((e: { id: string; }) => e.id === id)
-    return email.label;
-  }
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{props.email.subject}</CardTitle>
+        <CardTitle>{email.subject}</CardTitle>
         <CardDescription>
-          <div className='flex flex-row justify-between'>
-            <div>{props.email.from.name} | {props.email.from.email}</div>
-            <div>{new Date(props.email.sentDate).toDateString()}</div>
+          <div className="flex flex-row justify-between">
+            <div>{email.from.name} | {email.from.email}</div>
+            <div>{new Date(email.sentDate).toDateString()}</div>
           </div>
         </CardDescription>
       </CardHeader>
-      <CardContent>{props.email.snippet}</CardContent>
-      <CardFooter><Badge>{getLabel(props.email.id)}</Badge></CardFooter>
+      <CardContent>{email.snippet}</CardContent>
+      <CardFooter><Badge>{emailLabel}</Badge></CardFooter>
     </Card>
   );
-}
+};
 
-const EmailDrawer = ({ ...props }) => {
+const EmailDrawer: React.FC<EmailCardProps> = ({ email }) => {
   return (
     <Drawer>
       <DrawerTrigger>
-        <EmailCard {...props} />
+        <EmailCard email={email} />
       </DrawerTrigger>
       <DrawerContent>
-
         <DrawerHeader>
-          <DrawerTitle>{props.email.subject}</DrawerTitle>
-          <DrawerDescription >
-            <div className='flex flex-row justify-between'>
-              <div>{props.email.from.name} | {props.email.from.email}</div>
-              <div>{new Date(props.email.sentDate).toDateString()}</div>
+          <DrawerTitle>{email.subject}</DrawerTitle>
+          <DrawerDescription>
+            <div className="flex flex-row justify-between">
+              <div>{email.from.name} | {email.from.email}</div>
+              <div>{new Date(email.sentDate).toDateString()}</div>
             </div>
           </DrawerDescription>
         </DrawerHeader>
-
-
-        <p dangerouslySetInnerHTML={{ __html: props.email.textHtml }}></p>
+        <p dangerouslySetInnerHTML={{ __html: email.textHtml }}></p>
       </DrawerContent>
     </Drawer>
   );
+};
 
+interface EmailListProps {
+  emails: IEmail[];
 }
 
-
-const EmailList = ({ emails }: { emails: IEmail[] }) => {
-  // console.log(emails)
+const EmailList: React.FC<EmailListProps> = ({ emails }) => {
   return (
-    <div className='space-y-10'>
+    <div className="space-y-10">
       {emails.length === 0 && <p>No emails found.</p>}
       {emails.map((email) => (
         <EmailDrawer email={email} key={email.id} />
@@ -84,4 +90,3 @@ const EmailList = ({ emails }: { emails: IEmail[] }) => {
 };
 
 export default EmailList;
-

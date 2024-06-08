@@ -1,7 +1,7 @@
 import { gmail_v1, google } from "googleapis";
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../auth/[...nextauth]/options";
 import { NextResponse } from "next/server";
 
 import { IEmail, ParseGmailApi } from "gmail-api-parse-message-ts";
