@@ -18,9 +18,15 @@ import {
 } from "@/components/ui/drawer"
 
 import { IEmail } from 'gmail-api-parse-message-ts';
+import { Badge } from "@/components/ui/badge";
 
 
 const EmailCard = ({ ...props }) => {
+  const getLabel = (id: string) => {
+    const classify = JSON.parse(localStorage.getItem("classify") || "")
+    const email = classify.object.result.find((e: { id: string; }) => e.id === id)
+    return email.label;
+  }
   return (
     <Card>
       <CardHeader>
@@ -33,7 +39,7 @@ const EmailCard = ({ ...props }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>{props.email.snippet}</CardContent>
-      <CardFooter>{props.email.id}</CardFooter>
+      <CardFooter><Badge>{getLabel(props.email.id)}</Badge></CardFooter>
     </Card>
   );
 }
@@ -66,6 +72,7 @@ const EmailDrawer = ({ ...props }) => {
 
 
 const EmailList = ({ emails }: { emails: IEmail[] }) => {
+  // console.log(emails)
   return (
     <div className='space-y-10'>
       {emails.length === 0 && <p>No emails found.</p>}

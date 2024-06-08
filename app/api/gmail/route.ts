@@ -1,10 +1,9 @@
 import { gmail_v1, google } from "googleapis";
-import { NextApiRequest, NextApiResponse } from "next";
+
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
-import base64 from "base-64";
-import { JSDOM } from "jsdom";
+
 import { IEmail, ParseGmailApi } from "gmail-api-parse-message-ts";
 
 const getEmails = async (
@@ -31,11 +30,11 @@ const getEmails = async (
   return emailList;
 };
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return res.status(401).json({ error: "Unauthorized." });
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   const auth = new google.auth.OAuth2();
@@ -46,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const response = await gmail.users.messages.list({
       userId: "me",
-      maxResults: 10, // Adjust as needed
+      maxResults: 5, // Adjust as needed
     });
 
     const messages = response.data.messages;

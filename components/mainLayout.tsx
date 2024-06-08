@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import EmailList from "./emailList";
 import { IEmail } from "gmail-api-parse-message-ts";
 import { useEffect, useState } from 'react';
+import { JetBrains_Mono } from "next/font/google";
 
 
 
@@ -16,7 +17,7 @@ export default function MainLayout() {
     const [response, setResponse] = useState<string>("");
 
     const classify = async () => {
-        const response = await fetch('/api/ai', {
+        const res = await fetch('/api/ai', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +25,9 @@ export default function MainLayout() {
             body: JSON.stringify({ apiKey: localStorage.getItem("apiKey"), emails: emails }),
         }
         );
-        setResponse(await response.text());
+        const json = await res.json();
+        setResponse(json);
+        await localStorage.setItem("classify", JSON.stringify(json));
     }
 
 
@@ -43,6 +46,8 @@ export default function MainLayout() {
     }, []);
     let value
     value = localStorage.getItem("apiKey") || ""
+    let value2
+    value2 = localStorage.getItem("classify") || ""
     const { data: session } = useSession()
     return (
         <>
@@ -60,10 +65,10 @@ export default function MainLayout() {
                 <Button onClick={() => signOut()}>Sign out</Button>
             </div>
             <div className="flex flex-row justify-between w-full">
-                <Input type="number" className="w-1/12" defaultValue={3} />
+                <Input type="number" className="w-1/12" defaultValue={5} />
                 <Button onClick={() => { classify()}} variant="secondary">Classify</Button>
             </div>
-
+            {/* {response && JSON.stringify(response)} */}
             <EmailList emails={emails} />
         </>
 
